@@ -17,6 +17,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+
 @RunWith(SpringRunner.class)
 @WebMvcTest(StatisticsController.class)
 public class StatisticsControllerTest {
@@ -31,8 +33,11 @@ public class StatisticsControllerTest {
     public void postTransactionsSucceeds() throws Exception {
         when(statisticsService.add(any())).thenReturn(true);
 
+        String json = new ObjectMapper().writeValueAsString(new Transaction());
+
         mvc.perform(post("/transactions")
-                .contentType(APPLICATION_JSON))
+                .contentType(APPLICATION_JSON)
+                .content(json))
                 .andExpect(status().isCreated());
     }
 
@@ -40,8 +45,11 @@ public class StatisticsControllerTest {
     public void postTransactionsFails() throws Exception {
         when(statisticsService.add(any())).thenReturn(false);
 
+        String json = new ObjectMapper().writeValueAsString(new Transaction());
+
         mvc.perform(post("/transactions")
-                .contentType(APPLICATION_JSON))
+                .contentType(APPLICATION_JSON)
+                .content(json))
                 .andExpect(status().isNoContent());
     }
 
@@ -50,6 +58,6 @@ public class StatisticsControllerTest {
         mvc.perform(get("/statistics")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("stat", is(123.456)));
+                .andExpect(jsonPath("sum", is(123.45)));
     }
 }
