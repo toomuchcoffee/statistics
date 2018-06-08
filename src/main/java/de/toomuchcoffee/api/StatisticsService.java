@@ -1,5 +1,6 @@
 package de.toomuchcoffee.api;
 
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -10,7 +11,9 @@ public class StatisticsService {
     private List<Transaction> transactions = new ArrayList<>();
 
     public void add(Transaction transaction) {
-        transactions.add(transaction);
+        if (transaction.getTimestamp() >= Instant.now().toEpochMilli() - 60_000L) {
+            transactions.add(transaction);
+        }
     }
 
     public Statistics get() {
