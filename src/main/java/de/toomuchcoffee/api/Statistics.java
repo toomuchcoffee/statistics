@@ -3,8 +3,8 @@ package de.toomuchcoffee.api;
 public class Statistics {
     private double sum;
     private double avg;
-    private double max;
-    private double min;
+    private Double max;
+    private Double min;
     private long count;
 
     public double getSum() {
@@ -23,19 +23,19 @@ public class Statistics {
         this.avg = avg;
     }
 
-    public double getMax() {
+    public Double getMax() {
         return max;
     }
 
-    public void setMax(final double max) {
+    public void setMax(final Double max) {
         this.max = max;
     }
 
-    public double getMin() {
+    public Double getMin() {
         return min;
     }
 
-    public void setMin(final double min) {
+    public void setMin(final Double min) {
         this.min = min;
     }
 
