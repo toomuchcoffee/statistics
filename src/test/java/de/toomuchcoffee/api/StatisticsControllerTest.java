@@ -55,9 +55,23 @@ public class StatisticsControllerTest {
 
     @Test
     public void getStatistics() throws Exception {
+        Statistics statistics = new Statistics();
+        statistics.setSum(123.45);
+        statistics.setCount(123);
+        statistics.setAvg(456.12);
+        statistics.setMax(999.87);
+        statistics.setMin(0.12);
+
+        when(statisticsService.get()).thenReturn(statistics);
+
         mvc.perform(get("/statistics")
                 .contentType(APPLICATION_JSON))
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("sum", is(123.45)));
+                .andExpect(jsonPath("sum", is(123.45)))
+                .andExpect(jsonPath("count", is(123)))
+                .andExpect(jsonPath("avg", is(456.12)))
+                .andExpect(jsonPath("max", is(999.87)))
+                .andExpect(jsonPath("min", is(0.12)))
+        ;
     }
 }

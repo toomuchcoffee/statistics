@@ -28,9 +28,7 @@ public class StatisticsController {
 
     @GetMapping("statistics")
     public Statistics getStatistics() {
-        Statistics statistics = new Statistics();
-        statistics.setSum(123.45);
-        return statistics;
+        return statisticsService.get();
     }
 
 }
