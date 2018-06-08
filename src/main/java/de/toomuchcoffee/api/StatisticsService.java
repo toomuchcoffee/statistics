@@ -10,10 +10,12 @@ import org.springframework.stereotype.Service;
 public class StatisticsService {
     private List<Transaction> transactions = new ArrayList<>();
 
-    public void add(Transaction transaction) {
+    public boolean add(Transaction transaction) {
         if (transaction.getTimestamp() >= Instant.now().toEpochMilli() - 60_000L) {
             transactions.add(transaction);
+            return true;
         }
+        return false;
     }
 
     public Statistics get() {
