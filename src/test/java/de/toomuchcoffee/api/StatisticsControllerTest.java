@@ -33,7 +33,7 @@ public class StatisticsControllerTest {
     public void postTransactionsSucceeds() throws Exception {
         when(statisticsService.add(any())).thenReturn(true);
 
-        String json = new ObjectMapper().writeValueAsString(new Transaction());
+        String json = new ObjectMapper().writeValueAsString(new Transaction(0d, 0));
 
         mvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
@@ -45,7 +45,7 @@ public class StatisticsControllerTest {
     public void postTransactionsFails() throws Exception {
         when(statisticsService.add(any())).thenReturn(false);
 
-        String json = new ObjectMapper().writeValueAsString(new Transaction());
+        String json = new ObjectMapper().writeValueAsString(new Transaction(0d, 0));
 
         mvc.perform(post("/transactions")
                 .contentType(APPLICATION_JSON)
@@ -55,12 +55,7 @@ public class StatisticsControllerTest {
 
     @Test
     public void getStatistics() throws Exception {
-        Statistics statistics = new Statistics();
-        statistics.setSum(123.45);
-        statistics.setCount(123);
-        statistics.setAvg(456.12);
-        statistics.setMax(999.87);
-        statistics.setMin(0.12);
+        Statistics statistics = new Statistics(123, 123.45, 0.12, 999.87, 456.12);
 
         when(statisticsService.get()).thenReturn(statistics);
 

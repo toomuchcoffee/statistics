@@ -1,22 +1,13 @@
 package de.toomuchcoffee.api;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+import lombok.Setter;
+
+@Getter
+@Setter
+@RequiredArgsConstructor
 public class Transaction {
-    private double amount;
-    private long timestamp;
-
-    public double getAmount() {
-        return amount;
-    }
-
-    public void setAmount(final double amount) {
-        this.amount = amount;
-    }
-
-    public long getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(final long timestamp) {
-        this.timestamp = timestamp;
-    }
+    private final double amount;
+    private final long timestamp;
 }

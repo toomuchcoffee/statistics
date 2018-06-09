@@ -21,8 +21,7 @@ public class StatisticsServiceTest {
 
     @Test
     public void addTransactionAddsToCount() {
-        Transaction transaction = new Transaction();
-        transaction.setTimestamp(Instant.now().toEpochMilli());
+        Transaction transaction = new Transaction(0, Instant.now().toEpochMilli());
 
         assertThat(statisticsService.get().getCount()).isEqualTo(0);
 
@@ -36,8 +35,7 @@ public class StatisticsServiceTest {
         long now = Instant.now().toEpochMilli();
         long longAgo = now - 60_001L;
 
-        Transaction transaction = new Transaction();
-        transaction.setTimestamp(longAgo);
+        Transaction transaction = new Transaction(0, longAgo);
 
         assertThat(statisticsService.get().getCount()).isEqualTo(0);
 
@@ -53,12 +51,7 @@ public class StatisticsServiceTest {
 
         Statistics statistics = statisticsService.get();
 
-        Statistics expected = new Statistics();
-        expected.setCount(1);
-        expected.setAvg(1_234.56);
-        expected.setMax(1_234.56);
-        expected.setMin(1_234.56);
-        expected.setSum(1_234.56);
+        Statistics expected = new Statistics(1, 1_234.56, 1_234.56, 1_234.56, 1_234.56);
 
         assertThat(statistics).isEqualToComparingFieldByField(expected);
 
@@ -72,12 +65,7 @@ public class StatisticsServiceTest {
 
         Statistics statistics = statisticsService.get();
 
-        Statistics expected = new Statistics();
-        expected.setCount(3);
-        expected.setAvg(50d);
-        expected.setMax(99d);
-        expected.setMin(1d);
-        expected.setSum(150d);
+        Statistics expected = new Statistics(3, 150d, 1d, 99d, 50d);
 
         assertThat(statistics).isEqualToComparingFieldByField(expected);
     }
@@ -86,14 +74,9 @@ public class StatisticsServiceTest {
     public void getStatisticsCalculatesStatisticsOnlyFromTransactionsOfLast60sec() {
         statisticsService.add(createTransaction(1d));
         statisticsService.add(createTransaction(99d));
-        statisticsService.add(createTransaction(1000d, Instant.now().toEpochMilli() - 59_500));
+        statisticsService.add(new Transaction(1000d, Instant.now().toEpochMilli() - 59_500));
 
-        Statistics expected = new Statistics();
-        expected.setCount(2);
-        expected.setAvg(50d);
-        expected.setMax(99d);
-        expected.setMin(1d);
-        expected.setSum(100d);
+        Statistics expected = new Statistics(2, 100d, 1d, 99d, 50d);
 
         await()
                 .atMost(Duration.ONE_SECOND)
@@ -106,16 +89,11 @@ public class StatisticsServiceTest {
 
     @Test
     public void getStatisticsCalculatesEmptyStatisticsWhenAllTransactionsAreOlderThan60sec() {
-        statisticsService.add(createTransaction(1d, Instant.now().toEpochMilli() - 59_500));
-        statisticsService.add(createTransaction(99d, Instant.now().toEpochMilli() - 59_500));
-        statisticsService.add(createTransaction(1000d, Instant.now().toEpochMilli() - 59_500));
+        statisticsService.add(new Transaction(1d, Instant.now().toEpochMilli() - 59_500));
+        statisticsService.add(new Transaction(99d, Instant.now().toEpochMilli() - 59_500));
+        statisticsService.add(new Transaction(1000d, Instant.now().toEpochMilli() - 59_500));
 
-        Statistics expected = new Statistics();
-        expected.setCount(0);
-        expected.setAvg(null);
-        expected.setMax(null);
-        expected.setMin(null);
-        expected.setSum(0);
+        Statistics expected = new Statistics(0, 0, null, null, null);
 
         await()
                 .atMost(Duration.ONE_SECOND)
@@ -134,12 +112,13 @@ public class StatisticsServiceTest {
 
         transactions.forEach(statisticsService::add);
 
-        Statistics expected = new Statistics();
-        expected.setCount(10_000);
-        expected.setMin(0d);
-        expected.setMax(9_999d);
-        expected.setAvg(transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble());
-        expected.setSum(transactions.stream().mapToDouble(Transaction::getAmount).sum());
+        Statistics expected = new Statistics(
+                10_000,
+                transactions.stream().mapToDouble(Transaction::getAmount).sum(),
+                0d,
+                9_999d,
+                transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble()
+        );
 
         Statistics statistics = statisticsService.get();
         assertThat(statistics).isEqualToComparingFieldByField(expected);
@@ -153,25 +132,20 @@ public class StatisticsServiceTest {
 
         transactions.forEach(t -> new Thread(() -> statisticsService.add(t)).start());
 
-        Statistics expected = new Statistics();
-        expected.setCount(10_000);
-        expected.setMin(0d);
-        expected.setMax(9_999d);
-        expected.setAvg(transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble());
-        expected.setSum(transactions.stream().mapToDouble(Transaction::getAmount).sum());
+        Statistics expected = new Statistics(
+                10_000,
+                transactions.stream().mapToDouble(Transaction::getAmount).sum(),
+                0d,
+                9_999d,
+                transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble()
+        );
 
         Statistics statistics = statisticsService.get();
         assertThat(statistics).isEqualToComparingFieldByField(expected);
     }
 
     private Transaction createTransaction(double amount) {
-        return createTransaction(amount, Instant.now().toEpochMilli());
+        return new Transaction(amount, Instant.now().toEpochMilli());
     }
 
-    private Transaction createTransaction(double amount, long timestamp) {
-        Transaction transaction = new Transaction();
-        transaction.setTimestamp(timestamp);
-        transaction.setAmount(amount);
-        return transaction;
-    }
 }
