@@ -65,24 +65,16 @@ public class StatisticsService {
 
     private void calculateSumAndAvgAfterAdd(double amount) {
         statistics.setSum(statistics.getSum() + amount);
-        if (statistics.getAvg() == null) {
-            statistics.setAvg(amount);
-        } else {
-            statistics.setAvg((statistics.getSum()) / statistics.getCount());
-        }
+        statistics.setAvg(statistics.getCount() == 0 ? 0 : statistics.getSum() / statistics.getCount());
     }
 
     private void calculateSumAndAvgAfterRemove(double amount) {
         statistics.setSum(statistics.getSum() - amount);
-        if (statistics.getCount() == 0) {
-            statistics.setAvg(null);
-        } else {
-            statistics.setAvg((statistics.getSum()) / statistics.getCount());
-        }
+        statistics.setAvg(statistics.getCount() == 0 ? 0 : statistics.getSum() / statistics.getCount());
     }
 
     private void findMinAndMaxAfterAdd(double amount) {
-        if (statistics.getMin() == null && statistics.getMax() == null) {
+        if (statistics.getCount() == 1) {
             statistics.setMin(amount);
             statistics.setMax(amount);
             sortedAmounts.add(amount);
@@ -97,8 +89,8 @@ public class StatisticsService {
 
     private void findMinAndMaxAfterRemove(double amount) {
         if (statistics.getCount() == 0) {
-            statistics.setMin(null);
-            statistics.setMax(null);
+            statistics.setMin(0);
+            statistics.setMax(0);
             sortedAmounts.remove();
         } else if (amount == statistics.getMin()) {
             sortedAmounts.removeFirst();

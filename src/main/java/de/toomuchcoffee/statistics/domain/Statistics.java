@@ -12,7 +12,7 @@ import lombok.Setter;
 public class Statistics {
     private long count;
     private double sum;
-    private Double min;
-    private Double max;
-    private Double avg;
+    private double min;
+    private double max;
+    private double avg;
 }

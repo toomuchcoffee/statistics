@@ -96,7 +96,7 @@ public class StatisticsServiceTest {
         statisticsService.add(new Transaction(99d, Instant.now().toEpochMilli() - 59_500));
         statisticsService.add(new Transaction(1000d, Instant.now().toEpochMilli() - 59_500));
 
-        Statistics expected = new Statistics(0, 0, null, null, null);
+        Statistics expected = new Statistics(0, 0, 0, 0, 0);
 
         await()
                 .atMost(Duration.ONE_SECOND)
