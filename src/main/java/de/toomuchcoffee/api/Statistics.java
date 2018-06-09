@@ -2,7 +2,7 @@ package de.toomuchcoffee.api;
 
 public class Statistics {
     private double sum;
-    private double avg;
+    private Double avg;
     private Double max;
     private Double min;
     private long count;
@@ -15,11 +15,11 @@ public class Statistics {
         this.sum = sum;
     }
 
-    public double getAvg() {
+    public Double getAvg() {
         return avg;
     }
 
-    public void setAvg(final double avg) {
+    public void setAvg(final Double avg) {
         this.avg = avg;
     }
 

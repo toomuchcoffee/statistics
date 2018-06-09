@@ -77,16 +77,40 @@ public class StatisticsServiceTest {
         statisticsService.add(createTransaction(99d));
         statisticsService.add(createTransaction(1000d, Instant.now().toEpochMilli() - 59_500));
 
+        Statistics expected = new Statistics();
+        expected.setCount(2);
+        expected.setAvg(50d);
+        expected.setMax(99d);
+        expected.setMin(1d);
+        expected.setSum(100d);
+
         await()
                 .atMost(Duration.ONE_SECOND)
                 .untilAsserted(() -> {
                     Statistics statistics = statisticsService.get();
+                    assertThat(statistics).isEqualToComparingFieldByField(expected);
+                });
 
-                    assertThat(statistics.getCount()).isEqualTo(2);
-                    assertThat(statistics.getAvg()).isEqualTo(50d);
-                    assertThat(statistics.getMax()).isEqualTo(99d);
-                    assertThat(statistics.getMin()).isEqualTo(1d);
-                    assertThat(statistics.getSum()).isEqualTo(100d);
+    }
+
+    @Test
+    public void getStatisticsCalculatesEmptyStatisticsWhenAllTransactionsAreOlderThan60sec() {
+        statisticsService.add(createTransaction(1d, Instant.now().toEpochMilli() - 59_500));
+        statisticsService.add(createTransaction(99d, Instant.now().toEpochMilli() - 59_500));
+        statisticsService.add(createTransaction(1000d, Instant.now().toEpochMilli() - 59_500));
+
+        Statistics expected = new Statistics();
+        expected.setCount(0);
+        expected.setAvg(null);
+        expected.setMax(null);
+        expected.setMin(null);
+        expected.setSum(0);
+
+        await()
+                .atMost(Duration.ONE_SECOND)
+                .untilAsserted(() -> {
+                    Statistics statistics = statisticsService.get();
+                    assertThat(statistics).isEqualToComparingFieldByField(expected);
                 });
 
     }
