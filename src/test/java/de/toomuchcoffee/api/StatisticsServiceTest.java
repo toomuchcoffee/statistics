@@ -50,11 +50,15 @@ public class StatisticsServiceTest {
 
         Statistics statistics = statisticsService.get();
 
-        assertThat(statistics.getCount()).isEqualTo(1);
-        assertThat(statistics.getAvg()).isEqualTo(1_234.56);
-        assertThat(statistics.getMax()).isEqualTo(1_234.56);
-        assertThat(statistics.getMin()).isEqualTo(1_234.56);
-        assertThat(statistics.getSum()).isEqualTo(1_234.56);
+        Statistics expected = new Statistics();
+        expected.setCount(1);
+        expected.setAvg(1_234.56);
+        expected.setMax(1_234.56);
+        expected.setMin(1_234.56);
+        expected.setSum(1_234.56);
+
+        assertThat(statistics).isEqualToComparingFieldByField(expected);
+
     }
 
     @Test
@@ -64,11 +68,14 @@ public class StatisticsServiceTest {
 
         Statistics statistics = statisticsService.get();
 
-        assertThat(statistics.getCount()).isEqualTo(2);
-        assertThat(statistics.getAvg()).isEqualTo(50d);
-        assertThat(statistics.getMax()).isEqualTo(99d);
-        assertThat(statistics.getMin()).isEqualTo(1d);
-        assertThat(statistics.getSum()).isEqualTo(100d);
+        Statistics expected = new Statistics();
+        expected.setCount(2);
+        expected.setAvg(50d);
+        expected.setMax(99d);
+        expected.setMin(1d);
+        expected.setSum(100d);
+
+        assertThat(statistics).isEqualToComparingFieldByField(expected);
     }
 
     @Test

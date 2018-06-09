@@ -4,8 +4,7 @@ import static java.util.Comparator.comparing;
 
 import java.time.Instant;
 import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.PriorityQueue;
 
 import org.springframework.stereotype.Service;
 
@@ -13,13 +12,12 @@ import org.springframework.stereotype.Service;
 public class StatisticsService {
     private Statistics statistics = new Statistics();
 
-    private List<Transaction> transactions = new ArrayList<>();
+    private PriorityQueue<Transaction> transactions = new PriorityQueue<>(comparing(Transaction::getTimestamp));
     private ArrayDeque<Double> sortedAmounts = new ArrayDeque<>();
 
     public boolean add(Transaction transaction) {
         if (isInTimeWindow(transaction)) {
             transactions.add(transaction);
-            transactions.sort(comparing(Transaction::getTimestamp));
             addToStatistics(transaction.getAmount());
             return true;
         }
@@ -53,13 +51,14 @@ public class StatisticsService {
         if (transactions.isEmpty()) {
             return;
         }
-        Transaction transaction = transactions.get(0);
+        Transaction transaction = transactions.peek();
+
         while (transaction != null && !isInTimeWindow(transaction)) {
-            transactions.remove(0);
+            transactions.poll();
 
             removeFromStatistics(transaction);
 
-            transaction = transactions.isEmpty() ? null : transactions.get(0);
+            transaction = transactions.isEmpty() ? null : transactions.peek();
         }
     }
 
