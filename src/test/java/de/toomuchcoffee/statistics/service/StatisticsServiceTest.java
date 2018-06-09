@@ -1,4 +1,4 @@
-package de.toomuchcoffee.api;
+package de.toomuchcoffee.statistics.service;
 
 
 import static java.util.stream.Collectors.toList;
@@ -13,6 +13,9 @@ import org.awaitility.Duration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
+
+import de.toomuchcoffee.statistics.domain.Statistics;
+import de.toomuchcoffee.statistics.domain.Transaction;
 
 @RunWith(MockitoJUnitRunner.class)
 public class StatisticsServiceTest {

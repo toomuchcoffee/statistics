@@ -1,4 +1,4 @@
-package de.toomuchcoffee.api;
+package de.toomuchcoffee.statistics.domain;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;

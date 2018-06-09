@@ -1,4 +1,4 @@
-package de.toomuchcoffee.api;
+package de.toomuchcoffee.statistics.service;
 
 import static java.util.Comparator.comparing;
 
@@ -7,6 +7,9 @@ import java.util.ArrayDeque;
 import java.util.PriorityQueue;
 
 import org.springframework.stereotype.Service;
+
+import de.toomuchcoffee.statistics.domain.Statistics;
+import de.toomuchcoffee.statistics.domain.Transaction;
 
 @Service
 public class StatisticsService {

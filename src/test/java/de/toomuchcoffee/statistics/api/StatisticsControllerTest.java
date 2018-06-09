@@ -1,4 +1,4 @@
-package de.toomuchcoffee.api;
+package de.toomuchcoffee.statistics.api;
 
 import static org.hamcrest.Matchers.is;
 import static org.mockito.Matchers.any;
@@ -18,6 +18,10 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+
+import de.toomuchcoffee.statistics.domain.Statistics;
+import de.toomuchcoffee.statistics.domain.Transaction;
+import de.toomuchcoffee.statistics.service.StatisticsService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest(StatisticsController.class)
