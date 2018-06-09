@@ -63,17 +63,18 @@ public class StatisticsServiceTest {
 
     @Test
     public void getStatisticsCalculatesStatisticsFromTwoExistingTransaction() {
+        statisticsService.add(createTransaction(50d));
         statisticsService.add(createTransaction(1d));
         statisticsService.add(createTransaction(99d));
 
         Statistics statistics = statisticsService.get();
 
         Statistics expected = new Statistics();
-        expected.setCount(2);
+        expected.setCount(3);
         expected.setAvg(50d);
         expected.setMax(99d);
         expected.setMin(1d);
-        expected.setSum(100d);
+        expected.setSum(150d);
 
         assertThat(statistics).isEqualToComparingFieldByField(expected);
     }
