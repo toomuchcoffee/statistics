@@ -38,16 +38,14 @@ public class StatisticsService {
 
     private void addToStatistics(double amount) {
         increaseCount();
-        increaseSum(amount);
         findMinAndMaxAfterAdd(amount);
-        calculateAvgAfterAdd(amount);
+        calculateSumAndAvgAfterAdd(amount);
     }
 
     private void removeFromStatistics(final Transaction transaction) {
         decreaseCount();
-        decreaseSum(transaction.getAmount());
         findMinAndMaxAfterRemove(transaction.getAmount());
-        calculateAvgAfterRemove(transaction.getAmount());
+        calculateSumAndAvgAfterRemove(transaction.getAmount());
     }
 
     private void removeOutdatedTransactions() {
@@ -65,19 +63,21 @@ public class StatisticsService {
         }
     }
 
-    private void calculateAvgAfterAdd(double amount) {
+    private void calculateSumAndAvgAfterAdd(double amount) {
+        statistics.setSum(statistics.getSum() + amount);
         if (statistics.getAvg() == null) {
             statistics.setAvg(amount);
         } else {
-            statistics.setAvg((statistics.getAvg() * (statistics.getCount() - 1) + amount) / statistics.getCount());
+            statistics.setAvg((statistics.getSum()) / statistics.getCount());
         }
     }
 
-    private void calculateAvgAfterRemove(double amount) {
+    private void calculateSumAndAvgAfterRemove(double amount) {
+        statistics.setSum(statistics.getSum() - amount);
         if (statistics.getCount() == 0) {
             statistics.setAvg(null);
         } else {
-            statistics.setAvg((statistics.getAvg() * (statistics.getCount() + 1) - amount) / statistics.getCount());
+            statistics.setAvg((statistics.getSum()) / statistics.getCount());
         }
     }
 
@@ -107,14 +107,6 @@ public class StatisticsService {
             sortedAmounts.removeLast();
             statistics.setMax(sortedAmounts.getLast());
         }
-    }
-
-    private void increaseSum(double amount) {
-        statistics.setSum(statistics.getSum() + amount);
-    }
-
-    private void decreaseSum(double amount) {
-        statistics.setSum(statistics.getSum() - amount);
     }
 
     private void increaseCount() {
