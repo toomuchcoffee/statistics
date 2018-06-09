@@ -2,9 +2,11 @@ package de.toomuchcoffee.api;
 
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.awaitility.Awaitility.await;
 
 import java.time.Instant;
 
+import org.awaitility.Duration;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.runners.MockitoJUnitRunner;
@@ -73,15 +75,20 @@ public class StatisticsServiceTest {
     public void getStatisticsCalculatesStatisticsOnlyFromTransactionsOfLast60sec() {
         statisticsService.add(createTransaction(1d));
         statisticsService.add(createTransaction(99d));
-        statisticsService.add(createTransaction(1000d, Instant.now().toEpochMilli() - 70_000));
+        statisticsService.add(createTransaction(1000d, Instant.now().toEpochMilli() - 59_500));
 
-        Statistics statistics = statisticsService.get();
+        await()
+                .atMost(Duration.ONE_SECOND)
+                .untilAsserted(() -> {
+                    Statistics statistics = statisticsService.get();
 
-        assertThat(statistics.getCount()).isEqualTo(2);
-        assertThat(statistics.getAvg()).isEqualTo(50d);
-        assertThat(statistics.getMax()).isEqualTo(99d);
-        assertThat(statistics.getMin()).isEqualTo(1d);
-        assertThat(statistics.getSum()).isEqualTo(100d);
+                    assertThat(statistics.getCount()).isEqualTo(2);
+                    assertThat(statistics.getAvg()).isEqualTo(50d);
+                    assertThat(statistics.getMax()).isEqualTo(99d);
+                    assertThat(statistics.getMin()).isEqualTo(1d);
+                    assertThat(statistics.getSum()).isEqualTo(100d);
+                });
+
     }
 
     private Transaction createTransaction(double amount) {

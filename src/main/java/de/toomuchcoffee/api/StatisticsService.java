@@ -1,5 +1,7 @@
 package de.toomuchcoffee.api;
 
+import static java.util.stream.Collectors.toList;
+
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
@@ -11,22 +13,27 @@ public class StatisticsService {
     private List<Transaction> transactions = new ArrayList<>();
 
     public boolean add(Transaction transaction) {
-        if (transaction.getTimestamp() >= Instant.now().toEpochMilli() - 60_000L) {
+        if (isInTimeWindow(transaction)) {
             transactions.add(transaction);
             return true;
         }
         return false;
     }
 
+    private boolean isInTimeWindow(final Transaction transaction) {
+        return transaction.getTimestamp() >= Instant.now().toEpochMilli() - 60_000L;
+    }
+
     public Statistics get() {
-        Statistics statistics = new Statistics();
 
         Double min = null;
         Double max = null;
 
         double sum = 0d;
 
-        for (Transaction transaction : transactions) {
+
+        List<Transaction> transactionsInWindow = transactions.stream().filter(this::isInTimeWindow).collect(toList());
+        for (Transaction transaction : transactionsInWindow) {
             if (min == null || transaction.getAmount() < min) {
                 min = transaction.getAmount();
             }
@@ -36,13 +43,14 @@ public class StatisticsService {
             sum += transaction.getAmount();
         }
 
-        double avg = transactions.isEmpty() ? 0 : sum / transactions.size();
+        double avg = transactionsInWindow.isEmpty() ? 0 : sum / transactionsInWindow.size();
 
+        Statistics statistics = new Statistics();
         statistics.setMin(min);
         statistics.setMax(max);
         statistics.setAvg(avg);
         statistics.setSum(sum);
-        statistics.setCount(transactions.size());
+        statistics.setCount(transactionsInWindow.size());
         return statistics;
     }
 }
