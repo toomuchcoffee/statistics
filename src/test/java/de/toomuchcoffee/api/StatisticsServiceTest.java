@@ -1,10 +1,13 @@
 package de.toomuchcoffee.api;
 
 
+import static java.util.stream.Collectors.toList;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.awaitility.Awaitility.await;
 
 import java.time.Instant;
+import java.util.List;
+import java.util.stream.IntStream;
 
 import org.awaitility.Duration;
 import org.junit.Test;
@@ -121,6 +124,44 @@ public class StatisticsServiceTest {
                     assertThat(statistics).isEqualToComparingFieldByField(expected);
                 });
 
+    }
+
+    @Test
+    public void getStatisticsCalculatesStatististicsForLargeNumberOfTransactions() {
+        List<Transaction> transactions = IntStream.range(0, 10_000)
+                .mapToObj(this::createTransaction)
+                .collect(toList());
+
+        transactions.forEach(statisticsService::add);
+
+        Statistics expected = new Statistics();
+        expected.setCount(10_000);
+        expected.setMin(0d);
+        expected.setMax(9_999d);
+        expected.setAvg(transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble());
+        expected.setSum(transactions.stream().mapToDouble(Transaction::getAmount).sum());
+
+        Statistics statistics = statisticsService.get();
+        assertThat(statistics).isEqualToComparingFieldByField(expected);
+    }
+
+    @Test
+    public void getStatisticsCalculatesStatististicsConcurrentlyForLargeNumberOfTransactions() {
+        List<Transaction> transactions = IntStream.range(0, 10_000)
+                .mapToObj(this::createTransaction)
+                .collect(toList());
+
+        transactions.forEach(t -> new Thread(() -> statisticsService.add(t)).start());
+
+        Statistics expected = new Statistics();
+        expected.setCount(10_000);
+        expected.setMin(0d);
+        expected.setMax(9_999d);
+        expected.setAvg(transactions.stream().mapToDouble(Transaction::getAmount).average().getAsDouble());
+        expected.setSum(transactions.stream().mapToDouble(Transaction::getAmount).sum());
+
+        Statistics statistics = statisticsService.get();
+        assertThat(statistics).isEqualToComparingFieldByField(expected);
     }
 
     private Transaction createTransaction(double amount) {

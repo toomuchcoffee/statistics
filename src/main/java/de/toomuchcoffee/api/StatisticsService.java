@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 public class StatisticsService {
     private Statistics statistics = new Statistics();
 
-    private PriorityQueue<Transaction> transactions = new PriorityQueue<>(comparing(Transaction::getTimestamp));
+    private PriorityQueue<Transaction> sortedTransactions = new PriorityQueue<>(comparing(Transaction::getTimestamp));
     private ArrayDeque<Double> sortedAmounts = new ArrayDeque<>();
 
-    public boolean add(Transaction transaction) {
+    public synchronized boolean add(Transaction transaction) {
         if (isInTimeWindow(transaction)) {
-            transactions.add(transaction);
+            sortedTransactions.add(transaction);
             addToStatistics(transaction.getAmount());
             return true;
         }
@@ -48,17 +48,17 @@ public class StatisticsService {
     }
 
     private void removeOutdatedTransactions() {
-        if (transactions.isEmpty()) {
+        if (sortedTransactions.isEmpty()) {
             return;
         }
-        Transaction transaction = transactions.peek();
+        Transaction transaction = sortedTransactions.peek();
 
         while (transaction != null && !isInTimeWindow(transaction)) {
-            transactions.poll();
+            sortedTransactions.poll();
 
             removeFromStatistics(transaction);
 
-            transaction = transactions.isEmpty() ? null : transactions.peek();
+            transaction = sortedTransactions.isEmpty() ? null : sortedTransactions.peek();
         }
     }
 
